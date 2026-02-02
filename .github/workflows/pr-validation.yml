@@ -1,0 +1,25 @@
+name: PR Validation (Tiered Framework Test)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+  issue_comment:
+    types: [created]
+
+jobs:
+  org_checks:
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review' ||
+      github.event_name == 'pull_request_review_comment' ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request)
+    uses: razorpay/actions/.github/workflows/org-standard-checks.yml@feature/tiered-actions-framework
+    with:
+      pull_number: ${{ github.event.pull_request.number || github.event.issue.number }}
+      base_sha: ${{ github.event.pull_request.base.sha }}
+      head_sha: ${{ github.event.pull_request.head.sha }}
+      # Test with default settings for Phase 1 pilot
+    secrets: inherit
